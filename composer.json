@@ -1,4 +1,9 @@
 {
     "name": "walterjrey/phpword",
-    "description": ""
+    "description": "",
+    "autoload": {
+        "psr-4": {
+            "PhpOffice\\PhpWord\\": "src/PhpWord"
+        }
+    }
 }
