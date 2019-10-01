@@ -10,7 +10,7 @@
     "authors": [
         {
             "name": "Mark Baker"
-        },
+        }
     ],
     "scripts": {
         "test": [
