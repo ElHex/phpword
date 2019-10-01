@@ -36,7 +36,7 @@
         "fix": "Fixes issues found by PHP-CS"
     },
     "require": {
-        "php": "^5.3.3 || ^7.0",
+        "php": ">=5.3.3",
         "ext-xml": "*",
         "zendframework/zend-escaper": "^2.2",
         "phpoffice/common": "^0.2.9"
@@ -44,7 +44,7 @@
     "require-dev": {
         "ext-zip": "*",
         "ext-gd": "*",
-        "phpunit/phpunit": "^4.8.36 || ^7.0",
+        "phpunit/phpunit": ">=4.8.36",
         "squizlabs/php_codesniffer": "^2.9",
         "friendsofphp/php-cs-fixer": "^2.2",
         "phpmd/phpmd": "2.*",
