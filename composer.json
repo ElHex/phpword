@@ -37,7 +37,7 @@
     },
     "require": {
         "php": ">=5.3.3",
-        "ext-xml": "*",
+        "ext-xml": "*"
     },
     "require-dev": {
     },
