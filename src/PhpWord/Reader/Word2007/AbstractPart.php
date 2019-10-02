@@ -274,6 +274,14 @@ abstract class AbstractPart
             }
         }
         
+        $tab = $xmlReader->getElements('w:tab', $node->parentNode);
+        //print_r($tab);
+        //print_r($node->parentNode);        
+        foreach($tab as $ktab => $iTab) {
+            $parent->addText("[t]");
+        }
+        
+        
         if ($node->nodeName == 'w:footnoteReference') {
             // Footnote
             $wId = $xmlReader->getAttribute('w:id', $node);
