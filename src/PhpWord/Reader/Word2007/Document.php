@@ -52,6 +52,7 @@ class Document extends AbstractPart
         if ($nodes->length > 0) {
             $section = $this->phpWord->addSection();
             $isOL = false;
+            $isUL = false;
             foreach ($nodes as $node) {
                 $style = $xmlReader->getAttribute('w:val', $node, 'w:pPr/w:pStyle'); 
                 $sectPrNodeArray = $xmlReader->getElements('w:r/w:t', $node);
@@ -59,17 +60,27 @@ class Document extends AbstractPart
                 $isNumPR = $xmlReader->getElements('w:pPr/w:numPr', $node);
                 //print_r($isNumPR);
                 if(($style == 'Prrafodelista' || $isNumPR->length > 0)) {
+                    $liType = intval($xmlReader->getAttribute('w:val', $node, 'w:pPr/w:numPr/w:numId'));
+                    //print_r($liType);
                     if($sectPrNodeArray != null && $sectPrNodeArray->length > 0) {
-                        if($isOL == false) {
+                        if($isOL == false && $liType == 2) {
                             $section->addText("[ol]");
                             $isOL = true;
                         }
+                        if($isUL == false && $liType == 4) {
+                            $section->addText("[ul]");
+                            $isUL = true;
+                        }                        
                         $this->readOLNode($xmlReader, $node, $section);                         
                     }     
                 } else if (isset($readMethods[$node->nodeName])) {
                     if($isOL == true) {
                         $section->addText("[/ol]");
                         $isOL = false;
+                    }
+                    if($isUL == true) {
+                        $section->addText("[/ul]");
+                        $isUL = false;
                     }
                     $readMethod = $readMethods[$node->nodeName];
                     $this->$readMethod($xmlReader, $node, $section);
