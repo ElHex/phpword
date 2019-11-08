@@ -41,11 +41,35 @@ class Document extends AbstractPart
      *
      * @param \PhpOffice\PhpWord\PhpWord $phpWord
      */
+     
+    private function getNumberingType($val, $zipFile) {
+        $xmlFile = 'word/numbering.xml';
+        $zip = new \ZipArchive();
+        $zip->open($zipFile);
+        $content = $zip->getFromName($xmlFile);
+        $zip->close();
+        $content = str_replace(array("\n", "\r"), array("", ""), $content);
+        preg_match_all('/\<w\:num w\:numId\=\"'.$val.'\"\>\<w\:abstractNumId w\:val\=\"(.*?)\"\/\>\<\/w\:num\>/si', $content, $res);
+        
+        $abstract_num = $res[1][0];
+        
+        preg_match('/\<w\:abstractNum w\:abstractNumId\=\"'.$abstract_num.'\" w15\:restartNumberingAfterBreak\=\"0\">(.*?)\<\/w\:abstractNum\>/si', $content, $res2);
+        if(strpos($res2[0], 'decimal') !== FALSE) {
+            return "n";
+        } else {
+            return "b";
+        }
+       // echo $content;     
+    } 
+     
     public function read(PhpWord $phpWord)
     {
         $this->phpWord = $phpWord;
         $xmlReader = new XMLReader();
         $xmlReader->getDomFromZip($this->docFile, $this->xmlFile);
+        
+        
+        
         $readMethods = array('w:p' => 'readWPNode', 'w:tbl' => 'readTable', 'w:sectPr' => 'readWSectPrNode', 'w:sdt' => 'readSDTNode');
         $nodes = $xmlReader->getElements('w:body/*');
         
@@ -61,13 +85,14 @@ class Document extends AbstractPart
                 //print_r($isNumPR);
                 if(($style == 'Prrafodelista' || $isNumPR->length > 0)) {
                     $liType = intval($xmlReader->getAttribute('w:val', $node, 'w:pPr/w:numPr/w:numId'));
+                    $isNumbering = $this->getNumberingType($liType, $this->docFile);
                     //print_r($liType);
                     if($sectPrNodeArray != null && $sectPrNodeArray->length > 0) {
-                        if($isOL == false && $liType == 2) {
+                        if($isOL == false && $isNumbering == "n") {
                             $section->addText("[ol]");
                             $isOL = true;
                         }
-                        if($isUL == false && $liType == 4) {
+                        if($isUL == false && $isNumbering == "b") {
                             $section->addText("[ul]");
                             $isUL = true;
                         }                        
