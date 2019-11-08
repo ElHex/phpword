@@ -2,6 +2,9 @@
     "name": "walterjrey/phpword",
     "description": "",
     "require": {
+        "ext-xml": "*",
+        "zendframework/zend-escaper": "^2.2",
+        "phpoffice/common": "^0.2.9"
     },
     "autoload": {
         "psr-4": {
