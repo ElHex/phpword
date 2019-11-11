@@ -48,16 +48,27 @@ class Document extends AbstractPart
         $zip->open($zipFile);
         $content = $zip->getFromName($xmlFile);
         $zip->close();
+        //echo $content;
         $content = str_replace(array("\n", "\r"), array("", ""), $content);
         preg_match_all('/\<w\:num w\:numId\=\"'.$val.'\"\>\<w\:abstractNumId w\:val\=\"(.*?)\"\/\>\<\/w\:num\>/si', $content, $res);
-        
+
         $abstract_num = $res[1][0];
         
+        
         preg_match('/\<w\:abstractNum w\:abstractNumId\=\"'.$abstract_num.'\" w15\:restartNumberingAfterBreak\=\"0\">(.*?)\<\/w\:abstractNum\>/si', $content, $res2);
-        if(strpos($res2[0], 'decimal') !== FALSE) {
-            return "n";
+        if(!empty($res2[0])) {
+            if(strpos($res2[0], 'decimal') !== FALSE) {
+                return "n";
+            } else {
+                return "b";
+            }            
         } else {
-            return "b";
+            preg_match('/\<w\:abstractNum w\:abstractNumId\=\"'.$abstract_num.'\">(.*?)\<\/w\:abstractNum\>/si', $content, $res2);
+            if(strpos($res2[0], 'decimal') !== FALSE) {
+                return "n";
+            } else {
+                return "b";
+            }
         }
        // echo $content;     
     } 
