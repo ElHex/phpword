@@ -245,7 +245,8 @@ class Document extends AbstractPart
             $style['underline'] = 'single';
         }
         
-        //$style['lineHeight'] = 1.5;//$lineHeight;
+        //$style['lineHeight'] = 1.5;
+        //$lineHeight;
         //echo 'LH: ' . $lineHeight."\n";
         //print_r($section->getStyle());
         $section->setStyle($style);

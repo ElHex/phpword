@@ -108,7 +108,8 @@ abstract class AbstractPart
         $paragraphStyle = null;
         $headingDepth = null;
         
-        $lineHeight = 360;
+        $lineHeight = 360; //valor para line Height
+        //$lineHeight = 0;
         $sectPrNodeLineHeight = $xmlReader->getElement('w:pPr/w:spacing', $domNode);
         if($sectPrNodeLineHeight != null) {
             foreach($sectPrNodeLineHeight->attributes as $attr) {
@@ -124,7 +125,8 @@ abstract class AbstractPart
             $paragraphStyle = $this->readParagraphStyle($xmlReader, $domNode);
             $headingDepth = $this->getHeadingDepth($paragraphStyle);
         }
-        $paragraphStyle['lineHeight'] = ($lineHeight * 1.5 / 360);
+        //$paragraphStyle['lineHeight'] = ($lineHeight * 1.5 / 360); //ojo con esto, este linea ponia por default 1.5 de line-height
+        $paragraphStyle['lineHeight'] = ($lineHeight * 1 / 360);
         //print_r($paragraphStyle);
         // PreserveText
         if ($xmlReader->elementExists('w:r/w:instrText', $domNode)) {
