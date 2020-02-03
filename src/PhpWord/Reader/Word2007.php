@@ -59,7 +59,7 @@ class Word2007 extends AbstractReader implements ReaderInterface
             )),
         );
 
-        foreach ($steps as $step) {
+            foreach ($steps as $step) {
             $stepPart = $step['stepPart'];
             $stepItems = $step['stepItems'];
             if (!isset($relationships[$stepPart])) {
