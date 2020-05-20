@@ -1,5 +1,5 @@
 {
-    "name": "ElHex/phpword",
+    "name": "elhex/phpword",
     "description": "",
     "require": {
         "ext-xml": "*",
