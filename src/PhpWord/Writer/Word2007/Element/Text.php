@@ -33,6 +33,7 @@ class Text extends AbstractElement
     {
         $xmlWriter = $this->getXmlWriter();
         $element = $this->getElement();
+        $text = $element->getText();
         if (!$element instanceof \PhpOffice\PhpWord\Element\Text) {
             return;
         }
@@ -51,16 +52,58 @@ class Text extends AbstractElement
         if ($changed != null && $changed->getChangeType() == TrackChange::DELETED) {
             $textElement = 'w:delText';
         }
-        $xmlWriter->startElement($textElement);
 
-        $xmlWriter->writeAttribute('xml:space', 'preserve');
-        $this->writeText($this->getText($element->getText()));
-        $xmlWriter->endElement();
-        $xmlWriter->endElement(); // w:r
+        if (strpos($text, "\t") !== false) {
+            $text = explode("\t", $text);
 
-        $this->writeClosingTrackChange();
+            if ($element->getText() && !trim($element->getText(), "\t")) {
+                array_pop($text);
+             }
 
-        $this->endElementP(); // w:p
+            if (is_array($text)) {
+                foreach ($text as $t) {
+
+                    if($t!=""){
+
+                        $xmlWriter->startElement($textElement);
+                        $xmlWriter->writeAttribute('xml:space', 'preserve');
+
+                        $this->writeText($this->getText(str_replace("\t", '', $element->getText())));
+                        //$this->writeText($this->getText($element->getText()));
+
+                        $xmlWriter->endElement();
+
+                    }
+                    else{
+                        $xmlWriter->writeElement('w:tab', null);
+                    }
+
+                }
+
+                $xmlWriter->endElement(); // w:r
+                $this->writeClosingTrackChange();
+                $this->endElementP(); // w:p
+
+            }
+
+        }
+        else{
+
+            $xmlWriter->startElement($textElement);
+
+            $xmlWriter->writeAttribute('xml:space', 'preserve');
+            $this->writeText($this->getText($element->getText()));
+            $xmlWriter->endElement();
+            $xmlWriter->endElement(); // w:r
+    
+            $this->writeClosingTrackChange();
+    
+            $this->endElementP(); // w:p
+
+        }
+
+
+
     }
 
     /**
