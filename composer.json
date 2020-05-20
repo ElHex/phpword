@@ -1,5 +1,5 @@
 {
-    "name": "walterjrey/phpword",
+    "name": "ElHex/phpword",
     "description": "",
     "require": {
         "ext-xml": "*",
