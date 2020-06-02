@@ -56,6 +56,9 @@ class Image extends AbstractElement
     {
         $rId = $element->getRelationId() + ($element->isInSection() ? 6 : 0);
         $style = $element->getStyle();
+        $style->setUnit('pt');
+        $style->setWidth(number_format(\PhpOffice\PhpWord\Shared\Converter::pixelToPoint($style->getWidth()), 2, '.', ''));
+        $style->setHeight(number_format(\PhpOffice\PhpWord\Shared\Converter::pixelToPoint($style->getHeight()), 2, '.', ''));
         $styleWriter = new ImageStyleWriter($xmlWriter, $style);
 
         if (!$this->withoutP) {
