@@ -231,11 +231,15 @@ final class Language extends AbstractStyle
         if (strlen($locale) === 2) {
             return strtolower($locale) . '-' . strtoupper($locale);
         }
-
-        if ($locale !== null && $locale !== 'zxx' && strstr($locale, '-') === false) {
-            throw new \InvalidArgumentException($locale . ' is not a valid language code');
+        if (strpos($locale,'_') !== -1) {
+                $split = explode('_',$locale);
+                if (count($split) == 2) {
+                        return $split[0]. '-' .$split[1];
+                }
         }
-
+        if ($locale !== null && $locale !== 'zxx' && strstr($locale, '-') === false) {
+                return 'en-US';      
+        }
         return $locale;
     }
 }
