@@ -62,7 +62,12 @@ class Document extends AbstractPart
         <w:lvlJc w:val="left"/></w:lvl></w:lvlOverride></w:num><w:num w:numId="3"><w:abstractNumId w:val="0"/></w:num>"
         /*/
 
+        if(!isset($res[1][0])){
+            return "b";
+        }
+
         $abstract_num = $res[1][0];
+
 
         if($abstract_num == '&gt;'){
             $t="t";
@@ -110,9 +115,9 @@ class Document extends AbstractPart
                 //print_r($isNumPR);
                 if(($style == 'Prrafodelista' || $isNumPR->length > 0)) {
                     $liType = intval($xmlReader->getAttribute('w:val', $node, 'w:pPr/w:numPr/w:numId'));
-
-                    if($liType==2){$liType=1;}
+                    
                     $isNumbering = $this->getNumberingType($liType, $this->docFile);
+                   
                     //print_r($liType);
                     if($sectPrNodeArray != null && $sectPrNodeArray->length > 0) {
                         if($isOL == false && $isNumbering == "n") {
