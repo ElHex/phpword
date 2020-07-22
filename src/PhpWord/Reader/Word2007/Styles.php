@@ -41,6 +41,17 @@ class Styles extends AbstractPart
         $fontDefaults = $xmlReader->getElement('w:docDefaults/w:rPrDefault');
         if ($fontDefaults !== null) {
             $fontDefaultStyle = $this->readFontStyle($xmlReader, $fontDefaults);
+
+            if($fontDefaultStyle==null){
+
+                $fontDefaultStyle = [
+                    'name' => 'Arial',
+                    'size' => 10,
+                    'lang' => 'en-US'
+                  ];
+
+            }
+
             if (array_key_exists('name', $fontDefaultStyle)) {
                 $phpWord->setDefaultFontName($fontDefaultStyle['name']);
             }
