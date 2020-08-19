@@ -434,6 +434,33 @@ class Image extends AbstractElement
         $this->setProportionalSize($actualWidth, $actualHeight);
     }
 
+
+    /**
+     * Check memory image, supported type, image functions, and proportional width/height.
+     *
+     * @param url inside the document
+     */
+
+     public function fileExists($url,$sourceType){
+
+        if ($sourceType == self::SOURCE_ARCHIVE) {
+            $imageData = $this->getArchiveImageSize($url);
+        } elseif ($sourceType == self::SOURCE_STRING) {
+            $imageData = $this->getStringImageSize($url);
+        } else {
+            $imageData = @getimagesize($url);
+        }
+        if (!is_array($imageData)) {
+           return false;
+        }
+        else{
+            return true;
+        }
+
+
+     }
+
+
     /**
      * Set source type.
      */

@@ -22,7 +22,9 @@ use PhpOffice\PhpWord\ComplexType\TblWidth as TblWidthComplexType;
 use PhpOffice\PhpWord\Element\AbstractContainer;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Element\TrackChange;
+use PhpOffice\PhpWord\Element\Image;
 use PhpOffice\PhpWord\PhpWord;
+
 
 /**
  * Abstract part reader
@@ -316,13 +318,59 @@ abstract class AbstractPart
             $name = $xmlReader->getAttribute('name', $node, 'wp:inline/a:graphic/a:graphicData/pic:pic/pic:nvPicPr/pic:cNvPr');
             $embedId = $xmlReader->getAttribute('r:embed', $node, 'wp:inline/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip');
             $target = $this->getMediaTarget($docPart, $embedId);
+
+
             if (!is_null($target)) {
 
                $fextension = pathinfo($target, PATHINFO_EXTENSION);
 
                 if(strtolower($fextension) == "jpg" || strtolower($fextension) == "png" || strtolower($fextension) == "jpeg"){
-                    $imageSource = "zip://{$this->docFile}#{$target}"; //inicializador de imagenes
-                    $parent->addImage($imageSource, null, false, $name);
+
+                        /*/$reflectionMethod = new \ReflectionMethod("PhpOffice\PhpWord\Element\Image", "fileExists");
+
+                        $imageSource = "zip://{$this->docFile}#{$target}"; //inicializador de imagenes
+                        $sourceType = $this->getSourceType_Images($imageSource);
+    
+                        $reflect = new \ReflectionClass("PhpOffice\PhpWord\Element\Image");
+                        $reflect = $reflect->newInstanceWithoutConstructor();
+    
+                        $doFileExist= $reflect->fileExists($imageSource,$sourceType);/*/
+
+                      //  $this->rels[$docPart][$embedId]
+
+                        $imageSource = "zip://{$this->docFile}#{$target}";
+    
+                        if( $this->mediaExists($imageSource) ){
+                            $parent->addImage($imageSource, null, false, $name);
+                        }
+                        else {
+                            $alternative = $this->rels[$docPart][$embedId];
+                            $alternativeMediaFolder =  $alternative["docPart"];
+
+                                if($alternativeMediaFolder[0]=="/"){
+                                    $alternativeMediaFolder = ltrim($alternativeMediaFolder, '/'); 
+                                }
+
+                            if($alternativeMediaFolder!=null){
+
+                                $target =  $alternativeMediaFolder;
+                                $imageSource = "zip://{$this->docFile}#{$target}";
+
+                                if( $this->mediaExists($imageSource) ){
+                                    $parent->addImage($imageSource, null, false, $name);
+                                }
+
+                            }
+
+                        }
+
+
+
+                   /*/ if($doFileExist){
+                        $parent->addImage($imageSource, null, false, $name);
+                    }/*/
+
+                 
                 }
                 else{
                     $parent->addText("[Image with format '".$fextension."' is not supported (name: ".pathinfo($target, PATHINFO_FILENAME)." )]", null, null);
@@ -762,6 +810,65 @@ abstract class AbstractPart
 
         return $target;
     }
+
+    /**
+     * Modified function copied from Image - setSourceType() 
+     *
+     * @param string $source
+     * @return string|null
+     */
+
+    private function getSourceType_Images($source)
+    {
+
+       if($source!=null){ 
+
+        $reflect = new \ReflectionClass("PhpOffice\PhpWord\Element\Image");
+        $ImgConstants = $reflect->getConstants();
+
+
+
+            if (stripos(strrev($source), strrev('.php')) === 0) {
+            return $ImgConstants["SOURCE_GD"];
+            } elseif (strpos($source, 'zip://') !== false) {
+                return $ImgConstants["SOURCE_ARCHIVE"];
+            } elseif (filter_var($source, FILTER_VALIDATE_URL) !== false) {
+                if (strpos($source, 'https') === 0) {
+                    return $ImgConstants["SOURCE_STRING"];
+                } else {
+                    return $ImgConstants["SOURCE_GD"];
+                }
+            } elseif (@file_exists($source)) {
+                return $ImgConstants["SOURCE_LOCAL"];
+            } else {
+                return $ImgConstants["SOURCE_STRING"];
+            }
+        }
+        else{
+            return null;
+        }
+
+    }
+
+        /**
+     * Function to find if the image file exists within the document given the believed source 
+     *
+     * @param string $source
+     * @return string|null
+     */
+    
+    private function mediaExists($imageSource){
+
+
+        $sourceType = $this->getSourceType_Images($imageSource);
+
+        $reflect = new \ReflectionClass("PhpOffice\PhpWord\Element\Image");
+        $reflect = $reflect->newInstanceWithoutConstructor();
+
+       return $reflect->fileExists($imageSource,$sourceType);
+
+    }
+
 
     /**
      * Returns the target mode
