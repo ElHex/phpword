@@ -186,7 +186,7 @@ abstract class AbstractPart
                 $parent->addTextBreak(null, $paragraphStyle);
             } else {
 
-                $nodes = $xmlReader->getElements('*', $domNode);
+                $nodes = $xmlReader->getElements('*', $domNode); //ojo
                 $paragraph = $parent->addTextRun($paragraphStyle);
                 foreach ($nodes as $node) {
                     //print_r($node);
@@ -239,6 +239,9 @@ abstract class AbstractPart
             }
         } elseif ($domNode->nodeName == 'w:r') {
             $fontStyle = $this->readFontStyle($xmlReader, $domNode);
+
+
+
             $nodes = $xmlReader->getElements('*', $domNode);
             foreach ($nodes as $node) {
                 $this->readRunChild($xmlReader, $node, $parent, $docPart, $paragraphStyle, $fontStyle);
@@ -259,6 +262,14 @@ abstract class AbstractPart
     protected function readRunChild(XMLReader $xmlReader, \DOMElement $node, AbstractContainer $parent, $docPart, $paragraphStyle = null, $fontStyle = null)
     {
         $runParent = $node->parentNode->parentNode;
+
+        if($fontStyle==null && isset($paragraphStyle["styleName"])){
+
+           $docStyles = $this->getphpWord()->getDocumentStyles();
+
+            $index = $this->getphpWord()->SearchArray( $docStyles, 'styleId', $paragraphStyle["styleName"]);
+            $fontStyle = $docStyles[$index]->fontStyle;
+        }
         
         $indentValue = 0;
         $indents = $xmlReader->getElements('w:pPr/w:ind', $runParent);
@@ -887,4 +898,5 @@ abstract class AbstractPart
 
         return $mode;
     }
+
 }

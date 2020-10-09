@@ -358,4 +358,9 @@ class Document extends AbstractPart
         $section->setStyle($style);
         $this->readHeaderFooter($style, $section);
     }
+
+    public function getphpWord(){
+        return $this->phpWord;
+    }
+
 }

@@ -88,6 +88,14 @@ class PhpWord
     private $metadata = array();
 
     /**
+     * Styles
+     *
+     * @var array
+     * @since 0.12.0
+     */
+    private $styles = array();
+
+    /**
      * Create new instance
      *
      * Collections are created dynamically
@@ -421,5 +429,27 @@ class PhpWord
         $this->metadata['Document'] = $documentProperties;
 
         return $this;
+    }
+
+    public function getDocumentStyles(){
+        return $this->styles;
+    }
+
+    public function addDocumentStyle($stle){
+        array_push($this->styles,$stle);
+    }
+
+    public function SearchArray($array, $searchIndex, $searchValue)
+    {
+        if (!is_array($array) || $searchIndex == '')
+            return false;
+    
+        foreach ($array as $k => $v)
+        {
+            if (is_object($v) && property_exists($v, $searchIndex) && $v->$searchIndex == $searchValue)
+                return $k;
+        }
+    
+        return false;
     }
 }
