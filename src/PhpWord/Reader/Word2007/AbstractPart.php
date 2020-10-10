@@ -214,6 +214,19 @@ abstract class AbstractPart
             if (!empty($headingMatches)) {
                 return $headingMatches[1];
             }
+            else{
+
+                $docStyles = $this->getphpWord()->getDocumentStyles();
+
+                $index = $this->getphpWord()->SearchArray( $docStyles, 'styleId', $paragraphStyle["styleName"]);
+                $fontStyle = $docStyles[$index]->fontStyle;
+                preg_match('/heading (\d)/', strtolower($docStyles[$index]->name), $headingMatches);
+
+                if (!empty($headingMatches)) {
+                    return $headingMatches[1];
+                }
+
+            }
         }
 
         return null;
