@@ -48,6 +48,10 @@ class Document extends AbstractPart
         $zip->open($zipFile);
         $content = $zip->getFromName($xmlFile);
         $zip->close();
+
+        if($val == '&gt;'){
+            $val = 0;
+        }
  
         $content = str_replace(array("\n", "\r"), array("", ""), $content);
         preg_match_all('/\<w\:num w\:numId\=\"'.$val.'\"\>\<w\:abstractNumId w\:val\=\"(.*?)\"\/\>\<\/w\:num\>/si', $content, $res);
@@ -71,25 +75,38 @@ class Document extends AbstractPart
 
         if($abstract_num == '&gt;'){
             $t="t";
+            $abstract_num = 0;
         }
         
-        
-        preg_match('/\<w\:abstractNum w\:abstractNumId\=\"'.$abstract_num.'\" w15\:restartNumberingAfterBreak\=\"0\">(.*?)\<\/w\:abstractNum\>/si', $content, $res2);
-        if(!empty($res2[0])) {
-            if(strpos($res2[0], 'decimal') !== FALSE) {
-                return "n";
+        if(is_numeric($abstract_num)){
+
+            preg_match('/\<w\:abstractNum w\:abstractNumId\=\"'.$abstract_num.'\" w15\:restartNumberingAfterBreak\=\"0\">(.*?)\<\/w\:abstractNum\>/si', $content, $res2);
+            
+            if(!empty($res2[0])) {
+                if(strpos($res2[0], 'decimal') !== FALSE) {
+                    return "n";
+                } else {
+                    return "b";
+                }            
             } else {
-                return "b";
-            }            
-        } else {
-            preg_match('/\<w\:abstractNum w\:abstractNumId\=\"'.$abstract_num.'\">(.*?)\<\/w\:abstractNum\>/si', $content, $res2);
-            if(strpos($res2[0], 'decimal') !== FALSE) {
-                return "n";
-            } else {
-                return "b";
+                preg_match('/\<w\:abstractNum w\:abstractNumId\=\"'.$abstract_num.'\">(.*?)\<\/w\:abstractNum\>/si', $content, $res2);
+                if(strpos($res2[0], 'decimal') !== FALSE) {
+                    return "n";
+                } else {
+                    return "b";
+                }
             }
+
         }
-       // echo $content;     
+        else{
+            return "b";
+        }
+
+           
+
+       
+
+          
     } 
      
     public function read (PhpWord $phpWord)
@@ -107,7 +124,7 @@ class Document extends AbstractPart
             $section = $this->phpWord->addSection();
             $isOL = false;
             $isUL = false;
-            foreach ($nodes as $node) {
+            foreach ($nodes as $key => $node) {
                 $style = $xmlReader->getAttribute('w:val', $node, 'w:pPr/w:pStyle'); 
                 $sectPrNodeArray = $xmlReader->getElements('w:r/w:t', $node);
                 
@@ -116,6 +133,10 @@ class Document extends AbstractPart
                 if(($style == 'Prrafodelista' || $isNumPR->length > 0)) {
                     $liType = intval($xmlReader->getAttribute('w:val', $node, 'w:pPr/w:numPr/w:numId'));
                     
+                    if($key == 1112){
+                        $test = "t";
+                    }
+
                     $isNumbering = $this->getNumberingType($liType, $this->docFile);
                    
                     //print_r($liType);
