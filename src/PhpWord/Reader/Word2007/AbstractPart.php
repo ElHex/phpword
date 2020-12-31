@@ -437,6 +437,9 @@ abstract class AbstractPart
                 }
             }
         }
+        else if($node->nodeName == 'w:cr'){
+            $parent->addTextBreak();
+        }
     }
 
     /**
