@@ -295,19 +295,12 @@ abstract class AbstractPart
                 //echo "\nINDENTATION: {$indentValue}\n";    
             }
         }
-        if($indentValue > 0) {
-            $tabs = round($indentValue / 400);
-            for($ind = 0; $ind < $tabs; $ind++) {
-                $parent->addText("[t]");
-            }
-        }
+
         
-        $tab = $xmlReader->getElements('w:tab', $node->parentNode); //tabs ojo con esto
-        //print_r($tab);
-        //print_r($node->parentNode);        
+        /*/$tab = $xmlReader->getElements('w:tab', $node->parentNode); //tabs ojo con esto  
         foreach($tab as $ktab => $iTab) {
             $parent->addText("[t]");
-        }
+        }/*/
         
         
         if ($node->nodeName == 'w:footnoteReference') {
@@ -413,7 +406,7 @@ abstract class AbstractPart
         } elseif ($node->nodeName == 'w:br') {
             $parent->addTextBreak();
         } elseif ($node->nodeName == 'w:tab') {
-            $parent->addText("\t");
+            $parent->addText("[t]");
         } elseif ($node->nodeName == 'w:t' || $node->nodeName == 'w:delText') {
             // TextRun
             $textContent = htmlspecialchars($xmlReader->getValue('.', $node), ENT_QUOTES, 'UTF-8');
@@ -428,6 +421,12 @@ abstract class AbstractPart
                 }
             } else {
                 /** @var AbstractElement $element */
+                if($indentValue > 0) {
+                    $tabs = round($indentValue / 400);
+                    for($ind = 0; $ind < $tabs; $ind++) {
+                        $parent->addText("[t]");
+                    }
+                }
                 $element = $parent->addText($textContent, $fontStyle, $paragraphStyle);
                 if (in_array($runParent->nodeName, array('w:ins', 'w:del'))) {
                     $type = ($runParent->nodeName == 'w:del') ? TrackChange::DELETED : TrackChange::INSERTED;
@@ -436,9 +435,6 @@ abstract class AbstractPart
                     $element->setChangeInfo($type, $author, $date);
                 }
             }
-        }
-        else if($node->nodeName == 'w:cr'){
-            $parent->addTextBreak();
         }
     }
 
