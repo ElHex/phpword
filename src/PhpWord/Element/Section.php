@@ -214,7 +214,10 @@ class Section extends AbstractContainer
 
             return $container;
         }
-        throw new \Exception('Invalid header/footer type.');
+        else{
+       
+        }
+        //throw new \Exception('Invalid header/footer type.');
     }
 
     /**
