@@ -106,6 +106,8 @@ abstract class AbstractPart
      */
     protected function readParagraph(XMLReader $xmlReader, \DOMElement $domNode, $parent, $docPart = 'document')
     {
+
+        $docStyles = $this->getphpWord()->getDocumentStyles();
         // Paragraph style
         $paragraphStyle = null;
         $headingDepth = null;
@@ -129,8 +131,8 @@ abstract class AbstractPart
         }
         //$paragraphStyle['lineHeight'] = ($lineHeight * 1.5 / 360); //ojo con esto, este linea ponia por default 1.5 de line-height
          $paragraphStyle['lineHeight'] = ($lineHeight / 240); //240 in the xml format means a line height of 1.0
-        //print_r($paragraphStyle);
-        // PreserveText
+         $paragraphStyle['indentation']['firstLine'] = 360;
+
         if ($xmlReader->elementExists('w:r/w:instrText', $domNode)) {
             $ignoreText = false;
             $textContent = '';
@@ -276,6 +278,9 @@ abstract class AbstractPart
     {
         $runParent = $node->parentNode->parentNode;
 
+        $defaultDocStyle = $this->getphpWord()->getStylebyName("Normal");
+        $defaultDocStyle = $defaultDocStyle->getStyleValues();
+
         if($fontStyle==null && isset($paragraphStyle["styleName"])){
 
            $docStyles = $this->getphpWord()->getDocumentStyles();
@@ -285,6 +290,12 @@ abstract class AbstractPart
         }
         
         $indentValue = 0;
+
+        if(isset($defaultDocStyle["indentation"])){
+            $indentValue = $defaultDocStyle["indentation"]->getFirstLine();
+        }
+
+
         $indents = $xmlReader->getElements('w:pPr/w:ind', $runParent);
         if($indents->length > 0) {
             foreach($indents as $indent) {
@@ -296,13 +307,6 @@ abstract class AbstractPart
             }
         }
 
-        
-        /*/$tab = $xmlReader->getElements('w:tab', $node->parentNode); //tabs ojo con esto  
-        foreach($tab as $ktab => $iTab) {
-            $parent->addText("[t]");
-        }/*/
-        
-        
         if ($node->nodeName == 'w:footnoteReference') {
             // Footnote
             $wId = $xmlReader->getAttribute('w:id', $node);
@@ -516,6 +520,7 @@ abstract class AbstractPart
             'basedOn'             => array(self::READ_VALUE, 'w:basedOn'),
             'next'                => array(self::READ_VALUE, 'w:next'),
             'indent'              => array(self::READ_VALUE, 'w:ind', 'w:left'),
+            'firstLine'           => array(self::READ_VALUE, 'w:ind', 'w:firstLine'),
             'hanging'             => array(self::READ_VALUE, 'w:ind', 'w:hanging'),
             'spaceAfter'          => array(self::READ_VALUE, 'w:spacing', 'w:after'),
             'spaceBefore'         => array(self::READ_VALUE, 'w:spacing', 'w:before'),
@@ -528,7 +533,19 @@ abstract class AbstractPart
             'suppressAutoHyphens' => array(self::READ_TRUE,  'w:suppressAutoHyphens'),
         );
 
-        return $this->readStyleDefs($xmlReader, $styleNode, $styleDefs);
+        $pProperties = $this->readStyleDefs($xmlReader, $styleNode, $styleDefs);
+
+        if(isset($pProperties) && $pProperties!=null){
+
+                if(isset($pProperties["firstLine"])){
+
+                    $pProperties["indentation"]["firstLine"] = $pProperties["firstLine"];
+                    unset($pProperties["firstLine"]);
+
+                }
+        }
+
+        return $pProperties;
     }
 
     /**

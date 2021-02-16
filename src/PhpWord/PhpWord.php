@@ -322,8 +322,17 @@ class PhpWord
      */
     public function setDefaultParagraphStyle($styles)
     {
-        return Style::setDefaultParagraphStyle($styles);
+        
+        // $test = Style::getStyles();
+        // $a= Style::getStyle("Normal");
+        return  Style::setDefaultParagraphStyle($styles);
     }
+
+    
+    public function getStylebyName($styleName){
+        return Style::getStyle($styleName);
+    }
+
 
     /**
      * Load template by filename
