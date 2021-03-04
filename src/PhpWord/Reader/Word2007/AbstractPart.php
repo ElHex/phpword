@@ -186,6 +186,8 @@ abstract class AbstractPart
             $textRunContainers = $xmlReader->countElements('w:r|w:ins|w:del|w:hyperlink|w:smartTag', $domNode);
             if (0 === $textRunContainers) {
                 $parent->addTextBreak(null, $paragraphStyle);
+            } else if($domNode->tagName == "w:p" && $domNode->textContent == ""){
+                $parent->addTextBreak(null, $paragraphStyle);
             } else {
 
                 $nodes = $xmlReader->getElements('*', $domNode); //ojo
