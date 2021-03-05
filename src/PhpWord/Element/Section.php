@@ -203,7 +203,7 @@ class Section extends AbstractContainer
             ($header ? 'Header' : 'Footer');
         $collectionArray = $header ? 'headers' : 'footers';
         $collection = &$this->$collectionArray;
-
+        $type="default";
         if (in_array($type, array(Header::AUTO, Header::FIRST, Header::EVEN))) {
             $index = count($collection);
             /** @var \PhpOffice\PhpWord\Element\AbstractContainer $container Type hint */
