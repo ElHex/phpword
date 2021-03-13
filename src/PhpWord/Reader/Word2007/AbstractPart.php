@@ -256,8 +256,8 @@ abstract class AbstractPart
 
 
             $nodes = $xmlReader->getElements('*', $domNode);
-            foreach ($nodes as $node) {
-                $this->readRunChild($xmlReader, $node, $parent, $docPart, $paragraphStyle, $fontStyle);
+            foreach ($nodes as $index=>$node) {
+                $this->readRunChild($xmlReader, $node, $parent, $docPart, $paragraphStyle, $fontStyle,$index);
             }
         }
     }
@@ -272,7 +272,7 @@ abstract class AbstractPart
      * @param mixed $paragraphStyle
      * @param mixed $fontStyle
      */
-    protected function readRunChild(XMLReader $xmlReader, \DOMElement $node, AbstractContainer $parent, $docPart, $paragraphStyle = null, $fontStyle = null)
+    protected function readRunChild(XMLReader $xmlReader, \DOMElement $node, AbstractContainer $parent, $docPart, $paragraphStyle = null, $fontStyle = null, $pos)
     {
         $runParent = $node->parentNode->parentNode;
 
@@ -288,21 +288,19 @@ abstract class AbstractPart
 
         $indentValue = 0;
 
-        if(isset($paragraphStyleBase) && isset($paragraphStyleBase["indent"])){
-            $indentValue = $paragraphStyleBase["indent"];
-        }
+ 
+        if($pos == 0){
+
         
-      
-        $indents = $xmlReader->getElements('w:pPr/w:ind', $runParent);
-        if($indents->length > 0) {
-            foreach($indents as $indent) {
-                $indentValue = $indent->getAttribute('w:firstLine'); 
-                /*if(intval($indentValue) > 0) {
-                    $indentation = array('indentation' => array('left' => $indentValue, 'right' => 0));
-                }*/     
-                //echo "\nINDENTATION: {$indentValue}\n";    
+            $indents = $xmlReader->getElements('w:pPr/w:ind', $runParent);
+            if($indents->length > 0) {
+                foreach($indents as $indent) {
+                    $indentValue = $indent->getAttribute('w:firstLine');   
+                }
             }
         }
+
+
         if($indentValue > 0) {
             $tabs = round($indentValue / 500);
             for($ind = 0; $ind < $tabs; $ind++) {
