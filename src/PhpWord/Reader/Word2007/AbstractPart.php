@@ -291,7 +291,10 @@ abstract class AbstractPart
  
         if($pos == 0){
 
-        
+            if(isset($paragraphStyleBase["indent"])){
+                $indentValue = $paragraphStyleBase["indent"];
+            }
+            
             $indents = $xmlReader->getElements('w:pPr/w:ind', $runParent);
             if($indents->length > 0) {
                 foreach($indents as $indent) {
