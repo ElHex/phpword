@@ -188,9 +188,14 @@ abstract class AbstractPart
 
                 $nodes = $xmlReader->getElements('*', $domNode); //ojo
                 $paragraph = $parent->addTextRun($paragraphStyle);
-                foreach ($nodes as $node) {
-                    //print_r($node);
-                    $this->readRun($xmlReader, $node, $paragraph, $docPart, $paragraphStyle);
+                $rtagindex = 0;
+                foreach ($nodes as $index=>$node) {
+
+                    if($node->tagName=="w:r"){
+                        $rtagindex++;
+                    }
+
+                    $this->readRun($xmlReader, $node, $paragraph, $docPart, $paragraphStyle, $rtagindex);
                 }
             }
         }
@@ -243,7 +248,7 @@ abstract class AbstractPart
      *
      * @todo Footnote paragraph style
      */
-    protected function readRun(XMLReader $xmlReader, \DOMElement $domNode, $parent, $docPart, $paragraphStyle = null)
+    protected function readRun(XMLReader $xmlReader, \DOMElement $domNode, $parent, $docPart, $paragraphStyle = null, $nodePositioninParagraph)
     {
         if (in_array($domNode->nodeName, array('w:ins', 'w:del', 'w:smartTag', 'w:hyperlink'))) {
             $nodes = $xmlReader->getElements('*', $domNode);
@@ -257,7 +262,15 @@ abstract class AbstractPart
 
             $nodes = $xmlReader->getElements('*', $domNode);
             foreach ($nodes as $index=>$node) {
-                $this->readRunChild($xmlReader, $node, $parent, $docPart, $paragraphStyle, $fontStyle,$index);
+
+                if($index == 0){
+                    $this->readRunChild($xmlReader, $node, $parent, $docPart, $paragraphStyle, $fontStyle,$nodePositioninParagraph);
+                }
+                else{
+                    $this->readRunChild($xmlReader, $node, $parent, $docPart, $paragraphStyle, $fontStyle,-1);
+                }
+
+              
             }
         }
     }
@@ -289,7 +302,7 @@ abstract class AbstractPart
         $indentValue = 0;
 
  
-        if($pos == 0){
+        if($pos == 1){
 
             if(isset($paragraphStyleBase["indent"])){
                 $indentValue = $paragraphStyleBase["indent"];
