@@ -438,7 +438,7 @@ abstract class AbstractPart
         } elseif ($node->nodeName == 'w:br') {
             $parent->addTextBreak();
         } elseif ($node->nodeName == 'w:tab') {
-            $parent->addText("[t]");
+           // $parent->addText("[t]");
         } elseif ($node->nodeName == 'w:t' || $node->nodeName == 'w:delText') {
             // TextRun
             $textContent = htmlspecialchars($xmlReader->getValue('.', $node), ENT_QUOTES, 'UTF-8');
