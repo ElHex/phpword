@@ -248,7 +248,7 @@ abstract class AbstractPart
      *
      * @todo Footnote paragraph style
      */
-    protected function readRun(XMLReader $xmlReader, \DOMElement $domNode, $parent, $docPart, $paragraphStyle = null, $nodePositioninParagraph)
+    protected function readRun(XMLReader $xmlReader, \DOMElement $domNode, $parent, $docPart, $paragraphStyle = null, $nodePositioninParagraph = -1)
     {
         if (in_array($domNode->nodeName, array('w:ins', 'w:del', 'w:smartTag', 'w:hyperlink'))) {
             $nodes = $xmlReader->getElements('*', $domNode);
