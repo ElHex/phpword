@@ -133,6 +133,23 @@ abstract class AbstractPart
             $paragraphStyle['firstLineIndent'] = intval($defaultParagraphStyle->paragraphStyle["firstLine"]);
         }
 
+        if(isset($paragraphStyle["styleName"])){
+
+            $pStyle = $this->getphpWord()->getDocumentStyles($paragraphStyle["styleName"]);
+
+            if($this->getphpWord()->getDocumentStyles($paragraphStyle["styleName"]) != null){
+                $pStyle = $pStyle->paragraphStyle;
+                $paragraphStyle = array_merge($paragraphStyle, $pStyle);
+
+                if(isset($paragraphStyle["firstLine"])){
+                    $paragraphStyle['firstLineIndent'] = intval($paragraphStyle["firstLine"]);
+                }
+            }
+
+
+
+        }
+
         //$paragraphStyle['lineHeight'] = ($lineHeight * 1.5 / 360); //ojo con esto, este linea ponia por default 1.5 de line-height
          $paragraphStyle['lineHeight'] = ($lineHeight / 240); //240 in the xml format means a line height of 1.0
 
