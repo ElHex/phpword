@@ -322,17 +322,8 @@ class PhpWord
      */
     public function setDefaultParagraphStyle($styles)
     {
-        
-        // $test = Style::getStyles();
-        // $a= Style::getStyle("Normal");
-        return  Style::setDefaultParagraphStyle($styles);
+        return Style::setDefaultParagraphStyle($styles);
     }
-
-    
-    public function getStylebyName($styleName){
-        return Style::getStyle($styleName);
-    }
-
 
     /**
      * Load template by filename
@@ -440,8 +431,24 @@ class PhpWord
         return $this;
     }
 
-    public function getDocumentStyles(){
-        return $this->styles;
+    public function getDocumentStyles($styleName = null)
+    {
+        if($styleName == null){
+            return $this->styles;
+        }
+        else{
+            $styles = $this->styles;
+
+            $key = array_search($styleName, array_column($styles, 'name'));
+
+            if($key !== false){
+                return $styles[$key];
+            }
+            else{
+                return false;
+            }
+        }
+        
     }
 
     public function addDocumentStyle($stle){
