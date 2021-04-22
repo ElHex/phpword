@@ -188,28 +188,19 @@ class Document extends AbstractPart
                     $addMethod = "add{$hfType}";
                     $hfObject = $section->$addMethod($hfSetting['type']);
 
-                    if($hfObject!=null){
-                           // Read header/footer content
-                        $xmlReader = new XMLReader();
-                        $xmlReader->getDomFromZip($this->docFile, $xmlFile);
-                        $nodes = $xmlReader->getElements('*');
-                        if ($nodes->length > 0) {
-                            foreach ($nodes as $node) {
-                                if (isset($readMethods[$node->nodeName])) {
-                                    $readMethod = $readMethods[$node->nodeName];
-                                    $this->$readMethod($xmlReader, $node, $hfObject, $docPart);
-                                }
+                    // Read header/footer content
+                    $xmlReader = new XMLReader();
+                    $xmlReader->getDomFromZip($this->docFile, $xmlFile);
+                    $nodes = $xmlReader->getElements('*');
+                    if ($nodes->length > 0) {
+                        foreach ($nodes as $node) {
+                            if (isset($readMethods[$node->nodeName])) {
+                                $readMethod = $readMethods[$node->nodeName];
+                                $this->$readMethod($xmlReader, $node, $hfObject, $docPart);
                             }
                         }
                     }
-
-                 
-
-
                 }
-
-
-
             }
         }
     }
@@ -294,11 +285,15 @@ class Document extends AbstractPart
             $style['underline'] = 'single';
         }
         
+        //$style['lineHeight'] = 1.5;
+        //$lineHeight;
+        //echo 'LH: ' . $lineHeight."\n";
+        //print_r($section->getStyle());
         $section->setStyle($style);
         // Section properties
         if ($xmlReader->elementExists('w:pPr/w:sectPr', $node)) {
             $sectPrNode = $xmlReader->getElement('w:pPr/w:sectPr', $node);
-            if ($sectPrNode !== null) { //ojo
+            if ($sectPrNode !== null) {
                 $this->readWSectPrNode($xmlReader, $sectPrNode, $section);
             }
             $section = $this->phpWord->addSection();

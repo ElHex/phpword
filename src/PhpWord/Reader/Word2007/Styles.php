@@ -82,7 +82,7 @@ class Styles extends AbstractPart
                 }
                 $headingMatches = array();
                 preg_match('/Heading\s*(\d)/i', $name, $headingMatches);
-                $default = ($xmlReader->getAttribute('w:default', $node) == 1);
+                // $default = ($xmlReader->getAttribute('w:default', $node) == 1);
                 switch ($type) {
                     case 'paragraph':
                         $paragraphStyle = $this->readParagraphStyle($xmlReader, $node);
@@ -105,11 +105,7 @@ class Styles extends AbstractPart
                             'paragraphStyle' => $paragraphStyle,
                             'fontStyle' =>$fontStyle 
                           ];
-
-                        if($default === true){
-                            $phpWord->setDefaultParagraphStyle($paragraphStyle);
-                            $pstyle->default = true;
-                        }                        
+                        
                           
                     $phpWord->addDocumentStyle( $pstyle );
 

@@ -540,10 +540,6 @@ class Paragraph extends Border
             $lineHeight = (float) (preg_replace('/[^0-9\.\,]/', '', $lineHeight));
         }
 
-        if($lineHeight == 0){
-            $lineHeight = 1;
-        }
-        
         if ((!is_int($lineHeight) && !is_float($lineHeight)) || !$lineHeight) {
             throw new InvalidStyleException('Line height must be a valid number');
         }

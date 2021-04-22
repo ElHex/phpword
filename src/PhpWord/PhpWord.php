@@ -431,24 +431,8 @@ class PhpWord
         return $this;
     }
 
-    public function getDocumentStyles($styleName = null)
-    {
-        if($styleName == null){
-            return $this->styles;
-        }
-        else{
-            $styles = $this->styles;
-
-            $key = array_search($styleName, array_column($styles, 'name'));
-
-            if($key !== false){
-                return $styles[$key];
-            }
-            else{
-                return false;
-            }
-        }
-        
+    public function getDocumentStyles(){
+        return $this->styles;
     }
 
     public function addDocumentStyle($stle){

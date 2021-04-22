@@ -16,6 +16,7 @@
  */
 
 namespace PhpOffice\PhpWord\Shared;
+
 use PhpOffice\PhpWord\Element\AbstractContainer;
 use PhpOffice\PhpWord\Element\Row;
 use PhpOffice\PhpWord\Element\Table;
@@ -61,7 +62,6 @@ class Html
         // Preprocess: remove all line ends, decode HTML entity,
         // fix ampersand and angle brackets and add body tag for HTML fragments
         $html = str_replace(array("\n", "\r"), '', $html);
-        $html = str_replace(array("<br>"), '<br/>', $html);
         $html = str_replace(array('&lt;', '&gt;', '&amp;'), array('_lt_', '_gt_', '_amp_'), $html);
         $html = html_entity_decode($html, ENT_QUOTES, 'UTF-8');
         $html = str_replace('&', '&amp;', $html);
@@ -76,7 +76,6 @@ class Html
         $dom = new \DOMDocument();
         $dom->preserveWhiteSpace = $preserveWhiteSpace;
         $dom->loadXML($html);
-
         self::$xpath = new \DOMXPath($dom);
         $node = $dom->getElementsByTagName('body');
 

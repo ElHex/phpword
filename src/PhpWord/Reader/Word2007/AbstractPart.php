@@ -111,6 +111,7 @@ abstract class AbstractPart
         $headingDepth = null;
         
         $lineHeight = 240; //valor para line Height (360)
+        //$lineHeight = 0;
         $sectPrNodeLineHeight = $xmlReader->getElement('w:pPr/w:spacing', $domNode);
         if($sectPrNodeLineHeight != null) {
             foreach($sectPrNodeLineHeight->attributes as $attr) {
@@ -119,48 +120,23 @@ abstract class AbstractPart
                 }
             }
         }
-
+        //$lineHeight = 2.0;
         
         $indentValue = 0;
         if ($xmlReader->elementExists('w:pPr', $domNode)) {
             $paragraphStyle = $this->readParagraphStyle($xmlReader, $domNode);
             $headingDepth = $this->getHeadingDepth($paragraphStyle);
         }
-
-        $defaultParagraphStyle = $this->getphpWord()->getDocumentStyles("Normal");
-
-        if(isset($defaultParagraphStyle->paragraphStyle["firstLine"])) {
-            $paragraphStyle['firstLineIndent'] = intval($defaultParagraphStyle->paragraphStyle["firstLine"]);
-        }
-
-        if(isset($paragraphStyle["styleName"])){
-
-            $pStyle = $this->getphpWord()->getDocumentStyles($paragraphStyle["styleName"]);
-
-            if($this->getphpWord()->getDocumentStyles($paragraphStyle["styleName"]) != null){
-                $pStyle = $pStyle->paragraphStyle;
-                $paragraphStyle = array_merge($paragraphStyle, $pStyle);
-
-                if(isset($paragraphStyle["firstLine"])){
-                    $paragraphStyle['firstLineIndent'] = intval($paragraphStyle["firstLine"]);
-                }
-            }
-
-
-
-        }
-
         //$paragraphStyle['lineHeight'] = ($lineHeight * 1.5 / 360); //ojo con esto, este linea ponia por default 1.5 de line-height
          $paragraphStyle['lineHeight'] = ($lineHeight / 240); //240 in the xml format means a line height of 1.0
-
+        //print_r($paragraphStyle);
+        // PreserveText
         if ($xmlReader->elementExists('w:r/w:instrText', $domNode)) {
             $ignoreText = false;
             $textContent = '';
             $fontStyle = $this->readFontStyle($xmlReader, $domNode);
             $nodes = $xmlReader->getElements('w:r', $domNode);
-
             foreach ($nodes as $node) {
-
                 $instrText = $xmlReader->getValue('w:instrText', $node);
                 if ($xmlReader->elementExists('w:fldChar', $node)) {
                     $fldCharType = $xmlReader->getAttribute('w:fldCharType', $node, 'w:fldChar');
@@ -212,14 +188,9 @@ abstract class AbstractPart
 
                 $nodes = $xmlReader->getElements('*', $domNode); //ojo
                 $paragraph = $parent->addTextRun($paragraphStyle);
-                $rtagindex = 0;
-                foreach ($nodes as $key => $node) {
+                foreach ($nodes as $node) {
                     //print_r($node);
-                    if($node->tagName=="w:r"){
-                        $rtagindex++;
-                    }
-
-                    $this->readRun($xmlReader, $node, $paragraph, $docPart, $rtagindex, $paragraphStyle);
+                    $this->readRun($xmlReader, $node, $paragraph, $docPart, $paragraphStyle);
                 }
             }
         }
@@ -272,7 +243,7 @@ abstract class AbstractPart
      *
      * @todo Footnote paragraph style
      */
-    protected function readRun(XMLReader $xmlReader, \DOMElement $domNode, $parent, $docPart, $nodePositioninParagraph, $paragraphStyle = null)
+    protected function readRun(XMLReader $xmlReader, \DOMElement $domNode, $parent, $docPart, $paragraphStyle = null)
     {
         if (in_array($domNode->nodeName, array('w:ins', 'w:del', 'w:smartTag', 'w:hyperlink'))) {
             $nodes = $xmlReader->getElements('*', $domNode);
@@ -280,11 +251,13 @@ abstract class AbstractPart
                 $this->readRun($xmlReader, $node, $parent, $docPart, $paragraphStyle);
             }
         } elseif ($domNode->nodeName == 'w:r') {
-
             $fontStyle = $this->readFontStyle($xmlReader, $domNode);
+
+
+
             $nodes = $xmlReader->getElements('*', $domNode);
-            foreach ($nodes as $key => $node) {
-                $this->readRunChild($xmlReader, $node, $parent, $docPart, $nodePositioninParagraph, $paragraphStyle, $fontStyle);
+            foreach ($nodes as $node) {
+                $this->readRunChild($xmlReader, $node, $parent, $docPart, $paragraphStyle, $fontStyle);
             }
         }
     }
@@ -299,13 +272,9 @@ abstract class AbstractPart
      * @param mixed $paragraphStyle
      * @param mixed $fontStyle
      */
-    protected function readRunChild(XMLReader $xmlReader, \DOMElement $node, AbstractContainer $parent, $docPart, $position, $paragraphStyle = null, $fontStyle = null)
+    protected function readRunChild(XMLReader $xmlReader, \DOMElement $node, AbstractContainer $parent, $docPart, $paragraphStyle = null, $fontStyle = null)
     {
         $runParent = $node->parentNode->parentNode;
-        $indentValue = 0;
-        if(isset($paragraphStyle["firstLineIndent"]) && $position==1 && $node->tagName == "w:t"){
-            $indentValue = $paragraphStyle["firstLineIndent"];
-        }
 
         if($fontStyle==null && isset($paragraphStyle["styleName"])){
 
@@ -315,22 +284,27 @@ abstract class AbstractPart
             $fontStyle = $docStyles[$index]->fontStyle;
         }
         
-        
+        $indentValue = 0;
         $indents = $xmlReader->getElements('w:pPr/w:ind', $runParent);
         if($indents->length > 0) {
             foreach($indents as $indent) {
-                $indentValue = $indent->getAttribute('w:firstLine');    
+                $indentValue = $indent->getAttribute('w:firstLine'); 
+                /*if(intval($indentValue) > 0) {
+                    $indentation = array('indentation' => array('left' => $indentValue, 'right' => 0));
+                }*/     
+                //echo "\nINDENTATION: {$indentValue}\n";    
             }
         }
         if($indentValue > 0) {
-            $tabs = round($indentValue / 500);
+            $tabs = round($indentValue / 400);
             for($ind = 0; $ind < $tabs; $ind++) {
                 $parent->addText("[t]");
             }
         }
         
         $tab = $xmlReader->getElements('w:tab', $node->parentNode); //tabs ojo con esto
-   
+        //print_r($tab);
+        //print_r($node->parentNode);        
         foreach($tab as $ktab => $iTab) {
             $parent->addText("[t]");
         }
@@ -439,7 +413,7 @@ abstract class AbstractPart
         } elseif ($node->nodeName == 'w:br') {
             $parent->addTextBreak();
         } elseif ($node->nodeName == 'w:tab') {
-           // $parent->addText("[t]");
+            $parent->addText("\t");
         } elseif ($node->nodeName == 'w:t' || $node->nodeName == 'w:delText') {
             // TextRun
             $textContent = htmlspecialchars($xmlReader->getValue('.', $node), ENT_QUOTES, 'UTF-8');
@@ -543,7 +517,6 @@ abstract class AbstractPart
             'basedOn'             => array(self::READ_VALUE, 'w:basedOn'),
             'next'                => array(self::READ_VALUE, 'w:next'),
             'indent'              => array(self::READ_VALUE, 'w:ind', 'w:left'),
-            'firstLine'           => array(self::READ_VALUE, 'w:ind', 'w:firstLine'),
             'hanging'             => array(self::READ_VALUE, 'w:ind', 'w:hanging'),
             'spaceAfter'          => array(self::READ_VALUE, 'w:spacing', 'w:after'),
             'spaceBefore'         => array(self::READ_VALUE, 'w:spacing', 'w:before'),

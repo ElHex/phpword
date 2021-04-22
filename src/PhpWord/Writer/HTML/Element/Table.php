@@ -52,19 +52,11 @@ class Table extends AbstractElement
                 for ($j = 0; $j < $rowCellCount; $j++) {
                     $cellStyle = $rowCells[$j]->getStyle();
                     $cellBgColor = $cellStyle->getBgColor();
-
-                    
-
                     $cellFgColor = null;
                     if ($cellBgColor) {
-                       /*/ $red = hexdec(substr($cellBgColor, 0, 2));
+                        $red = hexdec(substr($cellBgColor, 0, 2));
                         $green = hexdec(substr($cellBgColor, 2, 2));
                         $blue = hexdec(substr($cellBgColor, 4, 2));
-                        /*/
-                        $red = hexdec(substr("000000", 0, 2));
-                        $green = hexdec(substr("000000", 2, 2));
-                        $blue = hexdec(substr("000000", 4, 2));
-                        
                         $cellFgColor = (($red * 0.299 + $green * 0.587 + $blue * 0.114) > 186) ? null : 'ffffff';
                     }
                     $cellColSpan = $cellStyle->getGridSpan();
