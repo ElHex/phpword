@@ -63,7 +63,7 @@ class Footnotes extends AbstractPart
                     if ($element !== null) {
                         $pNodes = $xmlReader->getElements('w:p/*', $node);
                         foreach ($pNodes as $pNode) {
-                            $this->readRun($xmlReader, $pNode, $element, $this->collection);
+                            $this->readRun($xmlReader, $pNode, $element, $this->collection,null);
                         }
                         $addMethod = "add{$this->element}";
                         $phpWord->$addMethod($element);
