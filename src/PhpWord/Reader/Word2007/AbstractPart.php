@@ -248,7 +248,7 @@ abstract class AbstractPart
      *
      * @todo Footnote paragraph style
      */
-    protected function readRun(XMLReader $xmlReader, \DOMElement $domNode, $parent, $docPart, $paragraphStyle = null, $nodePositioninParagraph)
+    protected function readRun(XMLReader $xmlReader, \DOMElement $domNode, $parent, $docPart, $paragraphStyle = null, $nodePositioninParagraph = -1)
     {
         if (in_array($domNode->nodeName, array('w:ins', 'w:del', 'w:smartTag', 'w:hyperlink'))) {
             $nodes = $xmlReader->getElements('*', $domNode);
@@ -313,7 +313,7 @@ abstract class AbstractPart
         }
 
         if($indentValue > 0) {
-            $tabs = round($indentValue / 400);
+            $tabs = round($indentValue / 500);
             for($ind = 0; $ind < $tabs; $ind++) {
                 $parent->addText("[t]");
             }
