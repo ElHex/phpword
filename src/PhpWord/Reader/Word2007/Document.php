@@ -188,19 +188,28 @@ class Document extends AbstractPart
                     $addMethod = "add{$hfType}";
                     $hfObject = $section->$addMethod($hfSetting['type']);
 
-                    // Read header/footer content
-                    $xmlReader = new XMLReader();
-                    $xmlReader->getDomFromZip($this->docFile, $xmlFile);
-                    $nodes = $xmlReader->getElements('*');
-                    if ($nodes->length > 0) {
-                        foreach ($nodes as $node) {
-                            if (isset($readMethods[$node->nodeName])) {
-                                $readMethod = $readMethods[$node->nodeName];
-                                $this->$readMethod($xmlReader, $node, $hfObject, $docPart);
+                    if($hfObject!=null){
+                           // Read header/footer content
+                        $xmlReader = new XMLReader();
+                        $xmlReader->getDomFromZip($this->docFile, $xmlFile);
+                        $nodes = $xmlReader->getElements('*');
+                        if ($nodes->length > 0) {
+                            foreach ($nodes as $node) {
+                                if (isset($readMethods[$node->nodeName])) {
+                                    $readMethod = $readMethods[$node->nodeName];
+                                    $this->$readMethod($xmlReader, $node, $hfObject, $docPart);
+                                }
                             }
                         }
                     }
+
+                 
+
+
                 }
+
+
+
             }
         }
     }
