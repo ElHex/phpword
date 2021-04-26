@@ -180,23 +180,22 @@ abstract class AbstractPart
             }
             $parent->addTitle($textContent, $headingDepth);
         } else {
-
+            // Text and TextRun
             $textRunContainers = $xmlReader->countElements('w:r|w:ins|w:del|w:hyperlink|w:smartTag', $domNode);
             if (0 === $textRunContainers) {
-                $parent->addTextBreak(null, $paragraphStyle);
-            } else if($domNode->tagName == "w:p" && $domNode->textContent == ""){
                 $parent->addTextBreak(null, $paragraphStyle);
             } else {
 
                 $nodes = $xmlReader->getElements('*', $domNode); //ojo
-
-                if($parent == null){
-                    $t="t";
-                }
                 $paragraph = $parent->addTextRun($paragraphStyle);
-                foreach ($nodes as $node) {
-                    //print_r($node);
-                    $this->readRun($xmlReader, $node, $paragraph, $docPart, $paragraphStyle);
+                $rtagindex = 0;
+                foreach ($nodes as $index=>$node) {
+
+                    if($node->tagName=="w:r"){
+                        $rtagindex++;
+                    }
+
+                    $this->readRun($xmlReader, $node, $paragraph, $docPart, $paragraphStyle, $rtagindex);
                 }
             }
         }
@@ -249,7 +248,7 @@ abstract class AbstractPart
      *
      * @todo Footnote paragraph style
      */
-    protected function readRun(XMLReader $xmlReader, \DOMElement $domNode, $parent, $docPart, $paragraphStyle = null)
+    protected function readRun(XMLReader $xmlReader, \DOMElement $domNode, $parent, $docPart, $paragraphStyle = null, $nodePositioninParagraph)
     {
         if (in_array($domNode->nodeName, array('w:ins', 'w:del', 'w:smartTag', 'w:hyperlink'))) {
             $nodes = $xmlReader->getElements('*', $domNode);
@@ -262,8 +261,16 @@ abstract class AbstractPart
 
 
             $nodes = $xmlReader->getElements('*', $domNode);
-            foreach ($nodes as $node) {
-                $this->readRunChild($xmlReader, $node, $parent, $docPart, $paragraphStyle, $fontStyle);
+            foreach ($nodes as $index=>$node) {
+
+                if($index == 0){
+                    $this->readRunChild($xmlReader, $node, $parent, $docPart, $paragraphStyle, $fontStyle,$nodePositioninParagraph);
+                }
+                else{
+                    $this->readRunChild($xmlReader, $node, $parent, $docPart, $paragraphStyle, $fontStyle,-1);
+                }
+
+              
             }
         }
     }
@@ -278,7 +285,7 @@ abstract class AbstractPart
      * @param mixed $paragraphStyle
      * @param mixed $fontStyle
      */
-    protected function readRunChild(XMLReader $xmlReader, \DOMElement $node, AbstractContainer $parent, $docPart, $paragraphStyle = null, $fontStyle = null)
+    protected function readRunChild(XMLReader $xmlReader, \DOMElement $node, AbstractContainer $parent, $docPart, $paragraphStyle = null, $fontStyle = null, $pos)
     {
         $runParent = $node->parentNode->parentNode;
 
@@ -291,16 +298,20 @@ abstract class AbstractPart
         }
         
         $indentValue = 0;
-        $indents = $xmlReader->getElements('w:pPr/w:ind', $runParent);
-        if($indents->length > 0) {
-            foreach($indents as $indent) {
-                $indentValue = $indent->getAttribute('w:firstLine'); 
-                /*if(intval($indentValue) > 0) {
-                    $indentation = array('indentation' => array('left' => $indentValue, 'right' => 0));
-                }*/     
-                //echo "\nINDENTATION: {$indentValue}\n";    
+
+        if($pos == 1){
+
+            $indents = $xmlReader->getElements('w:pPr/w:ind', $runParent);
+            if($indents->length > 0) {
+                foreach($indents as $indent) {
+    
+                    $indentValue = $indent->getAttribute('w:firstLine'); 
+    
+                }
             }
+
         }
+
         if($indentValue > 0) {
             $tabs = round($indentValue / 400);
             for($ind = 0; $ind < $tabs; $ind++) {
