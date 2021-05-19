@@ -169,6 +169,25 @@ abstract class AbstractPart
         } elseif ($headingDepth !== null) {
             // Heading or Title
             $textContent = null;
+            $headingStyle = null;
+
+            if($paragraphStyle!=null && isset($paragraphStyle['styleName'])){
+ 
+                 $headingStyle =  $this->getphpWord()->getStylebyId($paragraphStyle['styleName']);
+ 
+            }
+
+            if($xmlReader->elementExists('w:pPr', $domNode)){
+
+                $prp = $xmlReader->getElement('w:pPr', $domNode);
+                $inlineStyle = $this->readFontStyle($xmlReader, $prp);
+
+                if($inlineStyle != null ){
+                    $headingStyle = $inlineStyle;
+                }
+                
+            }
+
             $nodes = $xmlReader->getElements('w:r', $domNode);
             if ($nodes->length === 1) {
                 $textContent = htmlspecialchars($xmlReader->getValue('w:t', $nodes->item(0)), ENT_QUOTES, 'UTF-8');
@@ -178,14 +197,15 @@ abstract class AbstractPart
                     $this->readRun($xmlReader, $node, $textContent, $docPart, $paragraphStyle);
                 }
             }
-            $parent->addTitle($textContent, $headingDepth);
+           
+            $parent->addTitle($textContent, $headingDepth,$headingStyle);
         } else {
             // Text and TextRun
             $textRunContainers = $xmlReader->countElements('w:r|w:ins|w:del|w:hyperlink|w:smartTag', $domNode);
             if (0 === $textRunContainers) {
                 $parent->addTextBreak(null, $paragraphStyle);
             } else {
-
+                
                 $nodes = $xmlReader->getElements('*', $domNode); //ojo
                 $paragraph = $parent->addTextRun($paragraphStyle);
                 $rtagindex = 0;

@@ -19,6 +19,7 @@ namespace PhpOffice\PhpWord\Element;
 
 use PhpOffice\Common\Text as CommonText;
 use PhpOffice\PhpWord\Style;
+use PhpOffice\PhpWord\Style\Font;
 
 /**
  * Title element
@@ -59,7 +60,7 @@ class Title extends AbstractElement
      * @param string|TextRun $text
      * @param int $depth
      */
-    public function __construct($text, $depth = 1)
+    public function __construct($text, $depth = 1, $styleObject)
     {
         if (is_string($text)) {
             $this->text = CommonText::toUTF8($text);
@@ -67,6 +68,17 @@ class Title extends AbstractElement
             $this->text = $text;
         } else {
             throw new \InvalidArgumentException('Invalid text, should be a string or a TextRun');
+        }
+
+        if(isset($styleObject->fontStyle) && $styleObject->fontStyle != null){
+
+            $this->fontStyle = new Font('text', []);
+            $this->fontStyle->setStyleByArray($styleObject->fontStyle);
+
+        }
+        else if($styleObject != null){
+            $this->fontStyle = new Font('text', []);
+            $this->fontStyle->setStyleByArray($styleObject);
         }
 
         $this->depth = $depth;

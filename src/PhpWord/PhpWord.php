@@ -452,4 +452,24 @@ class PhpWord
     
         return false;
     }
+
+    public function getStylebyId($searchTerm){
+
+        $cStyles =  $this->styles;
+
+        $filter= array_filter($cStyles, function($style) use($searchTerm){
+           // return in_array($searchTerm, $style['name']);
+            return $searchTerm == $style->styleId;
+        });
+
+        if(count($filter)>0){
+            return reset($filter);
+        }
+        else{
+            return null;
+        }
+
+       
+
+    }
 }

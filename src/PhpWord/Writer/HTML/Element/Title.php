@@ -37,19 +37,45 @@ class Title extends AbstractElement
             return '';
         }
 
+        $fontStyle = null;
+        $style = "";
+
+
         $tag = 'h' . $this->element->getDepth();
 
         $text = $this->element->getText();
         if (is_string($text)) {
+
             if (Settings::isOutputEscapingEnabled()) {
                 $text = $this->escaper->escapeHtml($text);
             }
+
+            if(isset($this->element->fontStyle)){
+
+                $fontStyle = $this->element->fontStyle->getStyleValues();
+    
+                if($fontStyle['basic']['size'] != null){
+                    $style .= "font-size: ".$fontStyle['basic']['size']."pt;";
+                }
+    
+            }
+
         } elseif ($text instanceof \PhpOffice\PhpWord\Element\AbstractContainer) {
             $writer = new Container($this->parentWriter, $text);
             $text = $writer->write();
         }
 
-        $content = "<{$tag}>{$text}</{$tag}>" . PHP_EOL;
+        if($style!=""){
+
+            $content ="<{$tag}><span style='{$style}'>{$text}</span></{$tag}>" . PHP_EOL;
+            //$content ="<font style='{$style}'>{$text}</font>" . PHP_EOL;
+
+        }
+        else{
+
+            $content = "<{$tag}>{$text}</{$tag}>" . PHP_EOL;
+
+        }        
 
         return $content;
     }
