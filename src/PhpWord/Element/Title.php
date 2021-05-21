@@ -60,7 +60,7 @@ class Title extends AbstractElement
      * @param string|TextRun $text
      * @param int $depth
      */
-    public function __construct($text, $depth = 1, $styleObject)
+    public function __construct($text, $depth = 1, $styleObject = null)
     {
         if (is_string($text)) {
             $this->text = CommonText::toUTF8($text);
